@@ -101,9 +101,9 @@ pqlx_dict={'blue': (( 0.  ,  1.  ,  1.  ),
             ( 1.  ,  1.  ,  1.  ))}
             
 
-font = {'family' : 'normal',
+font = {'family' : 'sans-serif',
         'weight' : 'normal',
-        'size'   : 16}
+        'size'   : 10}
 
 matplotlib.rc('font', **font)
 
