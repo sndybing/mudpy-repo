@@ -3574,7 +3574,7 @@ def mudpy2sw4source(rupt,time_offset=0.0):
 
 
 def mudpy2srf(rupt,log_file,stf_dt=0.1,stf_type='triangle',inv_or_rupt='rupt',Ndip=None,
-              hypocenter=None,time_pad=5.0,minSTFpoints=16,integrate=False,Mw=None):
+              hypocenter=None,time_pad=5.0,minSTFpoints=16,integrate=False,Mw=None,make_src=False):
     '''
     Convert a mudpy .rupt or .inv file to SRF version 2 format
     
@@ -3693,31 +3693,32 @@ def mudpy2srf(rupt,log_file,stf_dt=0.1,stf_type='triangle',inv_or_rupt='rupt',Nd
     fout.write('  %.6f\t%.6f\t%d\t%d\t%.4f\t%.4f\n' % (elon,elat,Nstrike,Ndip,length,width))
     fout.write('  %.4f\t%.4f\t%.4f\t%.4f\t%.4f\n' % (strike,dip,depth_top,strike_hypo_position,dip_hypo_position))
     fout.write('POINTS %d\n' % (Nstrike*Ndip))
-    
-    #While we're here let's write the SRC file too
-    fsrc=open(src_file,'w')
-    fsrc.write('MAGNITUDE = %.4f\n' % Mw)
-    fsrc.write('FAULT_LENGTH = %.4f\n' % length)
-    fsrc.write('DLEN = %.4f\n' % dx_strike)
-    fsrc.write('FAULT_WIDTH = %.4f\n' % width)
-    fsrc.write('DWID = %.4f\n' % dx_dip)
-    fsrc.write('DEPTH_TO_TOP = %.4f\n' % depth_top)
-    fsrc.write('STRIKE = %.4f\n' % strike)
-    fsrc.write('RAKE = 9999\n')
-    fsrc.write('DIP = %.4f\n' % dip)
-    fsrc.write('LAT_TOP_CENTER = %.4f\n' % elat)
-    fsrc.write('LON_TOP_CENTER = %.4f\n' % elon)
-    fsrc.write('HYPO_ALONG_STK = %.4f\n' % strike_hypo_position)
-    fsrc.write('HYPO_DOWN_DIP = %.4f\n' % dip_hypo_position)
-    fsrc.write('DT = 0.01\n')
-    fsrc.write('SEED = 1')
-    fsrc.close()
+
+    if make_src:
+        #While we're here let's write the SRC file too
+        fsrc=open(src_file,'w')
+        fsrc.write('MAGNITUDE = %.4f\n' % Mw)
+        fsrc.write('FAULT_LENGTH = %.4f\n' % length)
+        fsrc.write('DLEN = %.4f\n' % dx_strike)
+        fsrc.write('FAULT_WIDTH = %.4f\n' % width)
+        fsrc.write('DWID = %.4f\n' % dx_dip)
+        fsrc.write('DEPTH_TO_TOP = %.4f\n' % depth_top)
+        fsrc.write('STRIKE = %.4f\n' % strike)
+        fsrc.write('RAKE = 9999\n')
+        fsrc.write('DIP = %.4f\n' % dip)
+        fsrc.write('LAT_TOP_CENTER = %.4f\n' % elat)
+        fsrc.write('LON_TOP_CENTER = %.4f\n' % elon)
+        fsrc.write('HYPO_ALONG_STK = %.4f\n' % strike_hypo_position)
+        fsrc.write('HYPO_DOWN_DIP = %.4f\n' % dip_hypo_position)
+        fsrc.write('DT = 0.01\n')
+        fsrc.write('SEED = 1')
+        fsrc.close()
     
     #And that was jsut the headers, now let's move on to getting the subfault source time functions
     # Note mudpy works in mks SRF is cgs so must convert accordingly
     minNTstf=99999
     for kfault in range(len(f)):
-        print(kfault)
+        # print(kfault)
         zero_slip=False
         #Get values for "Headers" for this subfault
         lon=f[kfault,1]
@@ -3739,12 +3740,12 @@ def mudpy2srf(rupt,log_file,stf_dt=0.1,stf_type='triangle',inv_or_rupt='rupt',Nd
         if slip==0:
             zero_slip=True
             stf = zeros(int(total_time/stf_dt))
-            print('Zero slip at '+str(kfault))
+            # print('Zero slip at '+str(kfault))
         elif rise_time==0:
             slip=0
             zero_slip=True
             stf = zeros(int(total_time/stf_dt))
-            print('Zero rise time at '+str(kfault))
+            # print('Zero rise time at '+str(kfault))
         else:
             tstf,stf=build_source_time_function(rise_time,stf_dt,total_time,stf_type=stf_type,zeta=0.2,scale=True)
             #tstf,stf=build_source_time_function(rise_time,stf_dt,total_time,stf_type='triangle',scale=True)
@@ -3762,7 +3763,7 @@ def mudpy2srf(rupt,log_file,stf_dt=0.1,stf_type='triangle',inv_or_rupt='rupt',Nd
         #How mant STF points?
         NTstf=len(stf)
         if NTstf<minSTFpoints: #Too short, zero pad
-            print('Padding short STF...')
+            # print('Padding short STF...')
             zeros_pad=zeros(int(minSTFpoints/2))
             stf=r_[zeros_pad,stf,zeros_pad]
             #Change start time of STF, it should now begin time_pad seconds earlier
@@ -3817,7 +3818,7 @@ def mudpy2srf(rupt,log_file,stf_dt=0.1,stf_type='triangle',inv_or_rupt='rupt',Nd
 
     
     # And done
-    print('minNTstf is: '+str(minNTstf))
+    # print('minNTstf is: '+str(minNTstf))
     fout.close()
     
 
