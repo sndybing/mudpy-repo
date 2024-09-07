@@ -67,13 +67,12 @@ def run_parallel_generate_ruptures(home,project_name,run_name,fault_name,slab_na
     if hypocenter is None:
         shypo=None
     else:
-        dist=((whole_fault[:,1]-hypocenter[0])**2+(whole_fault[:,2]-hypocenter[1])**2)**0.5
+        dist=((whole_fault[:,1]-hypocenter[0])**2+(whole_fault[:,2]-hypocenter[1])**2+(whole_fault[:,3]-hypocenter[2])**2)**0.5
         shypo=argmin(dist)
         
         # Re-define hypocenter as the coordinates of the hypocenter subfault in
         # case the original hypocenter did not perfectly align with a subfault
         hypocenter = whole_fault[shypo,1:4]
-    
 
     #Now loop over the number of realizations
     realization=0
@@ -249,7 +248,9 @@ def run_parallel_generate_ruptures(home,project_name,run_name,fault_name,slab_na
             if rise_time=='SSE':
                 shear_wave_fraction_shallow=1/60/60/24*2
                 shear_wave_fraction_deep=   1/60/60/24*2
-            
+            else: #regular EQs, do nothing
+                pass
+
             t_onset,length2fault=fakequakes.get_rupture_onset(home,project_name,slip,fault_array,model_name,hypocenter,shypo,rise_time_depths,
                                                  M0,velmod,shear_wave_fraction_shallow=shear_wave_fraction_shallow,
                                                  shear_wave_fraction_deep=shear_wave_fraction_deep)

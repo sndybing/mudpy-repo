@@ -926,7 +926,7 @@ def get_rupture_onset(home,project_name,slip,fault_array,model_name,hypocenter,s
     #Perturb depths of the hypocenter so that faults at the same depth are not zero onset
     delta=0.00001
     i_same_as_hypo=where(fault_array[:,3]==hypocenter[2])[0]
-    dist=((fault_array[:,1]-hypocenter[0])**2+(fault_array[:,2]-hypocenter[1])**2)**0.5
+    dist=((fault_array[:,1]-hypocenter[0])**2+(fault_array[:,2]-hypocenter[1])**2+(fault_array[:,3]-hypocenter[2])**2)**0.5
     i_hypo=argmin(dist)
 
     #Get faults at same depth that are NOT the hypo
